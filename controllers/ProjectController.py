@@ -5,6 +5,8 @@ class ProjectController:
 		self._db_connection = db_connection
 		self._contract_controller = contract_controller
 
+		self._project_dict = dict()
+
 	def add_project(self, name, contract):
 		db_cursor = self._db_connection.cursor()
 
@@ -19,19 +21,23 @@ class ProjectController:
 		return project
 
 	def get_all_projects_dict(self):
-		contracts = self._contract_controller.get_all_contracts_dict()
-
-		return_value = dict()
+		contract_dict = self._contract_controller.get_all_contracts_dict()
 
 		db_cursor = self._db_connection.cursor()
 		query = "SELECT * FROM Projects"
 		db_cursor.execute(query)
 
 		for row in db_cursor.fetchall():
-			project = self._create_project_from_row(row, contracts)
-			return_value[project.project_id] = project
+			project_id = row[0]
 
-		return return_value
+			if project_id in self._project_dict:
+				project = self._update_project_from_row(row, contract_dict, self._project_dict[project_id])
+			else:
+				project = self._create_project_from_row(row, contract_dict)
+
+			self._projects_dict[project.project_id] = project
+
+		return self._projects_dict
 
 	def _create_project_from_row(self, row, contract_dict):
 		project_id = row[0]
@@ -41,3 +47,8 @@ class ProjectController:
 		project = Project(project_id, name, contract_dict[contract_id])
 		return project
 		
+	def _update_project_from_row(self, row, contract_dict, project):
+		project.name = row[1]
+		project.contract = contract_dict[row[2]]
+
+		return project
