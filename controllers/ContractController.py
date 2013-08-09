@@ -50,8 +50,17 @@ class ContractController:
 	def _create_contract_from_row(self, row):
 		contract_id = row[0]
 		name = row[1]
-		start = dateutil.parser.parse(row[2]).date()
-		end = dateutil.parser.parse(row[3]).date()
+
+		if row[2] <> None:
+			start = dateutil.parser.parse(row[2]).date()
+		else:
+			start = None
+
+		if row[3] <> None:
+			end = dateutil.parser.parse(row[3]).date()
+		else:
+			end = None
+
 		hours = row[4]
 
 		contract = Contract(contract_id, name, start, end, hours)

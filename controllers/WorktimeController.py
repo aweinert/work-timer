@@ -13,12 +13,12 @@ class WorktimeController:
 	def add_worktime(self, project, category, start, end, description):
 		db_cursor = self._db_connection.cursor()
 
-		if start != None:
+		if start <> None:
 			start_param = str(start)
 		else:
 			start_param = None
 
-		if end != None:
+		if end <> None:
 			end_param = str(end)
 		else:
 			end_param = None
@@ -57,8 +57,17 @@ class WorktimeController:
 		time_id = row[0]
 		project_id = row[1]
 		category_id = row[2]
-		start = dateutil.parser.parse(row[3])
-		end = dateutil.parser.parse(row[4])
+
+		if row[3] <> None:
+			start = dateutil.parser.parse(row[3])
+		else:
+			start = None
+
+		if row[4] <> None:
+			end = dateutil.parser.parse(row[4])
+		else:
+			end = None
+
 		description = row[5]
 
 		worktime = Worktime(time_id, project_dict[project_id], category_dict[category_id], start, end, description)
@@ -67,8 +76,17 @@ class WorktimeController:
 	def _update_worktime_from_row(self, row, project_dict, category_dict, worktime):
 		worktime.project = project_dict[row[1]]
 		worktime.category = category_dict[row[2]]
-		worktime.start = dateutil.parser.parse(row[3])
-		worktime.end = dateutil.parser.parse(row[4])
+
+		if row[3] <> None:
+			worktime.start = dateutil.parser.parse(row[3])
+		else:
+			worktime.start = None
+
+		if row[4] <> None:
+			worktime.end = dateutil.parser.parse(row[4])
+		else:
+			worktime.end = None
+
 		worktime.description = row[5]
 
 		return worktime
