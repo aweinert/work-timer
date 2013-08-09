@@ -13,8 +13,18 @@ class WorktimeController:
 	def add_worktime(self, project, category, start, end, description):
 		db_cursor = self._db_connection.cursor()
 
+		if start != None:
+			start_param = str(start)
+		else:
+			start_param = None
+
+		if end != None:
+			end_param = str(end)
+		else:
+			end_param = None
+
 		query = "INSERT INTO Times (ProjectId, CategoryId, Start, End, Description) VALUES (?,?,?,?,?)"
-		db_cursor.execute(query, [project.project_id, category.category_id, str(start), str(end), description])
+		db_cursor.execute(query, [project.project_id, category.category_id, start_param, end_param, description])
 		worktime_id = db_cursor.lastrowid
 
 		self._db_connection.commit()

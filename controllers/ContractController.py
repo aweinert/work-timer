@@ -10,8 +10,18 @@ class ContractController:
 	def add_contract(self, name, start, end, hours):
 		db_cursor = self._db_connection.cursor()
 
+		if start <> None:
+			start_param = str(start)
+		else:
+			start_param = None
+
+		if end <> None:
+			end_param = str(end)
+		else:
+			end_param = None
+
 		query = "INSERT INTO Contracts(Name, Start, End, Hours) Values(?,?,?,?)"
-		db_cursor.execute(query, [name, start, end, hours])
+		db_cursor.execute(query, [name, start_param, end_param, hours])
 		contract_id = db_cursor.lastrowid
 
 		self._db_connection.commit()
