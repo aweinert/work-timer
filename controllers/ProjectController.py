@@ -35,9 +35,9 @@ class ProjectController:
 			else:
 				project = self._create_project_from_row(row, contract_dict)
 
-			self._projects_dict[project.project_id] = project
+			self._project_dict[project.project_id] = project
 
-		return self._projects_dict
+		return self._project_dict
 
 	def _create_project_from_row(self, row, contract_dict):
 		project_id = row[0]
