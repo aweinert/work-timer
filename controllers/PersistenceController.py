@@ -46,7 +46,7 @@ class CachedStore:
 		"""Returns all currently cached values as a dictionary"""
 		return self._storage.copy()
 
-class DatabaseController:
+class PersistenceController:
 	def __init__(self, db_path):
 		self._db_connection = sqlite3.connect(db_path)
 		cursor = self._db_connection.cursor()
