@@ -2,7 +2,6 @@ from domain import Project
 
 class ProjectController:
 	def __init__(self, db_connection, contract_controller):
-		# TODO: Comment
 		self._db_connection = db_connection
 		self._contract_controller = contract_controller
 

@@ -4,12 +4,11 @@ from domain import *
 
 class ContractController:
 	def __init__(self, db_connection):
-		# TODO: Comment
 		self._db_connection = db_connection
 		self._contracts_dict = dict()
 
 	def create_contract(self, name, start, end, hours):
-		# TODO: Comment
+		"""Writes a new domain-contract object and returns it to the caller"""
 		db_cursor = self._db_connection.cursor()
 
 		query = "INSERT INTO Contracts(Name, Start, End, Hours) Values(?,?,?,?)"

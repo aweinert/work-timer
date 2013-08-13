@@ -5,7 +5,6 @@ from domain import *
 
 class WorktimeController:
 	def __init__(self, db_connection, project_controller, contract_controller):
-		# TODO: Comment
 		self._db_connection = db_connection
 		self._project_controller = project_controller
 		self._contract_controller = contract_controller
@@ -13,7 +12,7 @@ class WorktimeController:
 		self._worktime_dict = dict()
 
 	def create_worktime(self, project, category, start, end, description):
-		# TODO: Comment
+		"""Writes a new domain-worktime object to the database and returns it to the caller"""
 		db_cursor = self._db_connection.cursor()
 
 		if start <> None:
@@ -37,7 +36,9 @@ class WorktimeController:
 		return worktime
 
 	def retrieve_all_worktimes(self):
-		# TODO: Comment
+		"""Returns a dictionary containing all worktimes in the database
+		
+		The returned dictionary maps worktime_ids to their respective worktime"""
 		return_value = {}
 
 		project_dict = self._project_controller.get_all_projects_dict()
@@ -55,7 +56,9 @@ class WorktimeController:
 		return return_value
 
 	def retrieve_worktime_by_id(self, worktime_id):
-		# TODO: Comment
+		"""Returns the worktime with the given id, if it exists in the database.
+		
+		If there is no worktime with the given id, None is returned"""
 		project_dict = self._project_controller.get_all_projects_dict()
 		category_dict = self._category_controller.get_all_categories_dict()
 
@@ -73,14 +76,17 @@ class WorktimeController:
 		return return_value
 	
 	def update_worktime(self, time):
-		# TODO: Comment
+		"""Writes the changes made in the given worktime to the database"""
+
 		db_cursor = self._db_connection.cursor()
 		query = "UPDATE Times SET ProjectId = ?, CategoryId = ?, Start = ?, End = ?, Description = ? WHERE TimeId = ?"
 		db_cursor.execute(query, [time.project.project_id, time.category.category_id, str(time.start), str(time.end), time.description, time.time_id])
 		self._db_connection.commit()
 		
 	def delete_worktime(self, time):
-		# TODO: Comment
+		"""Removes the given worktime from the database.
+		
+		The given worktime is considered invalid after a call to this method"""
 		db_cursor = self._db_connection.cursor()
 		
 		query = "DELETE FROM Times WHERE TimeId = ?"
@@ -90,6 +96,10 @@ class WorktimeController:
 		
 
 	def _create_worktime_from_row(self, row, project_dict, category_dict):
+		"""Creates a domain.Worktime object from a row returned from a database query
+		
+		The dictionaries shall map the ids of their objects to the object with the given id.
+		It may, for example, be obtained from some other Controller"""
 		time_id = row[0]
 		project_id = row[1]
 		category_id = row[2]
