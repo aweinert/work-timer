@@ -49,6 +49,11 @@ class DatabaseController:
 
 		self._project_controller = ProjectController(self._db_connection, self._contract_controller)
 		self._worktime_controller = WorktimeController(self._db_connection, self._project_controller, self._contract_controller)
+		
+		self._contracts = CachedStore(lambda contract: contract.contract_id, self._contract_controller.retrieve_project_by_id)
+		self._projects = CachedStore(lambda project: project.project_id, self._project_controller.retrieve_project_by_id)
+		self._categories = CachedStore(lambda category: category.category_id, self._category_controller.retrieve_category_by_id)
+		self._times = CachedStore(lambda time: time.time_id, self._worktime_controller.retrieve_worktime_by_id)
 
 		# CRUD-interface for contracts
 		def create_contract(self, name, start, end, hours):
