@@ -5,6 +5,33 @@ from CategoryController import *
 from ProjectController import *
 from WorktimeController import *
 
+class CachedStore:
+	"""Retrieves elements via some function and caches them after the first retrieval"""
+	def __init__(self, id_func, loader_func):
+		"""Initializes a cached store for a certain kind of objects
+		
+		Parameters
+		----------
+		id_func: Function that retrieves an unique id from an object given for storage
+		loader_func: Function that loads an object based on its id, if it is not already cached"""
+
+		self._storage = {}
+		self._get_id = id_func
+		self._load_by_id = loader_func
+	
+	def retrieve(self, object_id):
+		if object_id in self._storage:
+			return_value = self._storage[object_id]
+		else:
+			return_value = self._load_by_id(object_id)
+			self._storage(return_value)
+			
+		return return_value
+	
+	def store(self, obj):
+		object_id = self._get_id(obj)
+		self._storage[object_id] = obj
+
 class DatabaseController:
 	def __init__(self, db_path):
 		self._db_connection = sqlite3.connect(db_path)
