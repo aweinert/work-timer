@@ -31,6 +31,20 @@ class CachedStore:
 	def store(self, obj):
 		object_id = self._get_id(obj)
 		self._storage[object_id] = obj
+		
+	def delete(self, obj):
+		obj_id = self._get_id(obj)
+		
+		if obj_id in self._storage:
+			del self._storage[obj_id]
+		
+	def retrieve_values(self):
+		"""Returns all values in the cache as a list"""
+		return self._storage.values()
+	
+	def retrieve_dict(self):
+		"""Returns all currently cached values as a dictionary"""
+		return self._storage.copy()
 
 class DatabaseController:
 	def __init__(self, db_path):
@@ -68,67 +82,79 @@ class DatabaseController:
 
 		# CRUD-interface for contracts
 		def create_contract(self, name, start, end, hours):
-			pass
+			contract = self._contract_controller.create_contract(name, start, end, hours)
+			self._contracts.store(contract)
+			return contract
 		
 		def retrieve_all_contracts(self):
-			pass
+			return self._contracts.retrieve_values()
 		
 		def retrieve_contract_by_id(self, contract_id):
-			pass
+			return self._contracts.retrieve(contract_id)
 		
 		def update_contract(self, contract):
-			pass
+			self._contract_controller.update_contract(contract)
 		
 		def delete_contract(self, contract):
-			pass
+			self._contract_controller.delete_contract(contract)
+			self._contracts.delete(contract)
 
 		# CRUD-interface for projects
 		def create_project(self, name, contract):
-			pass
+			project = self._project_controller.create_project(name, contract)
+			self._projects.store(project)
+			return project
 		
 		def retrieve_all_projects(self):
-			pass
+			return self._projects.retrieve_values()
 		
 		def retrieve_project_by_id(self, project_id):
-			pass
+			return self._projects.retrieve(project_id)
 		
 		def update_project(self, project):
-			pass
+			self._project_controller.update_project(project)
 		
 		def delete_project(self, project):
-			pass
+			self._project_controller.delete_project(project)
+			self._projects.delete(project)
 
 		# CRUD-interface for categories
 		def create_category(self, name):
-			pass
+			category = self._category_controller.create_category(name)
+			self._categories.store(category)
+			return category
 		
 		def retrieve_all_categories(self):
-			pass
+			return self._categories.retrieve_values()
 		
 		def retrieve_category_by_id(self, category_id):
-			pass
+			return self._categories.retrieve(category_id)
 		
 		def update_category(self, category):
-			pass
+			self._category_controller.update_category(category)
 		
 		def delete_category(self, category):
-			pass
+			self._category_controller.delete_category(category)
+			self._categories.delete(category)
 		
 		# CRUD-interface for times
-		def create_worktime(self, name):
-			pass
+		def create_worktime(self, project, category, start, end, description):
+			worktime = self._worktime_controller.create_worktime(project, category, start, end, description)
+			self._times.store(worktime)
+			return worktime
 		
 		def retrieve_all_worktimes(self):
-			pass
+			return self._times.retrieve_values()
 		
 		def retrieve_worktime_by_id(self, worktime_id):
-			pass
+			return self._times.retrieve(worktime_id)
 		
 		def update_worktime(self, worktime):
-			pass
+			self._worktime_controller.update_worktime(worktime)
 		
 		def delete_worktime(self, worktime):
-			pass
+			self._worktime_controller.delete_worktime(worktime)
+			self._times.delete(worktime)
 		
 		def _create_and_populate_cache(self, creator_func, id_func, loader_func):
 			return_value = CachedStore(id_func, loader_func)
