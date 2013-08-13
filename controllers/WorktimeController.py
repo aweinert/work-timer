@@ -1,16 +1,19 @@
 import dateutil.parser
+import datetime
 
 from domain import *
 
 class WorktimeController:
 	def __init__(self, db_connection, project_controller, contract_controller):
+		# TODO: Comment
 		self._db_connection = db_connection
 		self._project_controller = project_controller
 		self._contract_controller = contract_controller
 
 		self._worktime_dict = dict()
 
-	def add_worktime(self, project, category, start, end, description):
+	def create_worktime(self, project, category, start, end, description):
+		# TODO: Comment
 		db_cursor = self._db_connection.cursor()
 
 		if start <> None:
@@ -33,7 +36,10 @@ class WorktimeController:
 
 		return worktime
 
-	def get_all_worktimes_dict(self):
+	def retrieve_all_worktimes(self):
+		# TODO: Comment
+		return_value = {}
+
 		project_dict = self._project_controller.get_all_projects_dict()
 		category_dict = self._category_controller.get_all_categories_dict()
 
@@ -43,15 +49,45 @@ class WorktimeController:
 
 		for row in db_cursor.fetchall():
 			worktime_id = row[0]
+			worktime = self._create_worktime_from_row(row, project_dict, category_dict)
+			return_value[worktime_id] = worktime
 
-			if worktime_id in self._worktime_dict:
-				worktime = self._update_worktime_from_row(row, project_dict, category_dict, self._worktime_dict[worktime_id])
-			else:
-				worktime = self._create_worktime_from_row(row, project_dict, category_dict)
+		return return_value
 
-			self._worktime_dict[time_id] = worktime
+	def retrieve_worktime_by_id(self, worktime_id):
+		# TODO: Comment
+		project_dict = self._project_controller.get_all_projects_dict()
+		category_dict = self._category_controller.get_all_categories_dict()
 
-		return self._worktime_dict
+		db_cursor = self._db_connection.cursor()
+		query = "SELECT * FROM Times WHERE TimeId = ?"
+		db_cursor.execute(query, worktime_id)
+
+		results = db_cursor.fetchall()
+		
+		if len(results) <> 1:
+			return_value = None
+		else:
+			return_value = self._create_worktime_from_row(results[0], project_dict, category_dict)
+
+		return return_value
+	
+	def update_worktime(self, time):
+		# TODO: Comment
+		db_cursor = self._db_connection.cursor()
+		query = "UPDATE Times SET ProjectId = ?, CategoryId = ?, Start = ?, End = ?, Description = ? WHERE TimeId = ?"
+		db_cursor.execute(query, [time.project.project_id, time.category.category_id, str(time.start), str(time.end), time.description, time.time_id])
+		self._db_connection.commit()
+		
+	def delete_worktime(self, time):
+		# TODO: Comment
+		db_cursor = self._db_connection.cursor()
+		
+		query = "DELETE FROM Times WHERE TimeId = ?"
+		db_cursor.execute(query, time.time_id)
+		
+		self._db_connection.commit()
+		
 
 	def _create_worktime_from_row(self, row, project_dict, category_dict):
 		time_id = row[0]
@@ -71,22 +107,4 @@ class WorktimeController:
 		description = row[5]
 
 		worktime = Worktime(time_id, project_dict[project_id], category_dict[category_id], start, end, description)
-		return worktime
-
-	def _update_worktime_from_row(self, row, project_dict, category_dict, worktime):
-		worktime.project = project_dict[row[1]]
-		worktime.category = category_dict[row[2]]
-
-		if row[3] <> None:
-			worktime.start = dateutil.parser.parse(row[3])
-		else:
-			worktime.start = None
-
-		if row[4] <> None:
-			worktime.end = dateutil.parser.parse(row[4])
-		else:
-			worktime.end = None
-
-		worktime.description = row[5]
-
 		return worktime

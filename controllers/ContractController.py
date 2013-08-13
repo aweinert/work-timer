@@ -4,24 +4,16 @@ from domain import *
 
 class ContractController:
 	def __init__(self, db_connection):
+		# TODO: Comment
 		self._db_connection = db_connection
 		self._contracts_dict = dict()
 
-	def add_contract(self, name, start, end, hours):
+	def create_contract(self, name, start, end, hours):
+		# TODO: Comment
 		db_cursor = self._db_connection.cursor()
 
-		if start <> None:
-			start_param = str(start)
-		else:
-			start_param = None
-
-		if end <> None:
-			end_param = str(end)
-		else:
-			end_param = None
-
 		query = "INSERT INTO Contracts(Name, Start, End, Hours) Values(?,?,?,?)"
-		db_cursor.execute(query, [name, start_param, end_param, hours])
+		db_cursor.execute(query, [name, self._python_datetime_to_sql(start), self._python_datetime_to_sql(end), hours])
 		contract_id = db_cursor.lastrowid
 
 		self._db_connection.commit()
@@ -30,47 +22,92 @@ class ContractController:
 
 		return contract
 
-	def get_all_contracts_dict(self):
+	def retrieve_all_contracts(self):
+		"""Returns a dictionary containing all contracts in the database
+		
+		The returned dictionary maps contract_ids to their respective contract"""
+
+		# Initialize return_value
+		return_value = {}
+
+		# Actually query database
 		db_cursor = self._db_connection.cursor()
 		query = "SELECT * FROM Contracts"
 		db_cursor.execute(query)
 
+		# Create objects from returned rows
 		for row in db_cursor.fetchall():
-			contract_id = row[0]
+			contract = self._create_contract_from_row(row)
+			return_value[contract.contract_id] = contract
 
-			if contract_id in self._contracts_dict:
-				contract = self._update_contract_from_row(row, self._contracts_dict[contract_id])
-			else:
-				contract = self._create_contract_from_row(row)
-				
-			self._contracts_dict[contract.contract_id] = contract
+		return return_value
+	
+	def retrieve_contract_by_id(self, contract_id):
+		"""Returns the contract with the given id, if it exists in the database.
+		
+		If there is no contract with the given id, None is returned"""
+		db_cursor = self._db_connection.cursor()
 
-		return self._contracts_dict
+		query = "SELECT * FROM Contracts WHERE ContractId = ?"
+		db_cursor.execute(query, contract_id)
+		
+		results = db_cursor.fetchall()
+		if len(results) <> 1:
+			return_value = None
+		else:
+			return_value = self._create_contract_from_row(results[0])
 
+		return return_value
+	
+	def update_contract(self, contract):
+		"""Writes the changes made in the given contract to the database"""
+		db_cursor = self._db_connection.cursor()
+		
+		query = "UPDATE Contracts SET (name = ?, start = ?, end = ?, hours = ?) WHERE contract_id = ?"
+		db_cursor.execute(query, contract.name, self._python_datetime_to_sql(contract.start), self._python_datetime_to_sql(contract.end), contract.hours, contract.contract_id)
+		
+		self._db_connection.commit()
+		
+	def delete_contract(self, contract):
+		"""Removes the given contract from the database.
+		
+		The given contract is considered invalid after a call to this method"""
+		db_cursor = self._db_connection.cursor()
+		
+		query = "DELETE FROM Contracts WHERE ContractId = ?"
+		db_cursor.execute(query, contract.contract_id)
+		
+		self._db_connection.commit()
+		
 	def _create_contract_from_row(self, row):
+		"""Creates a domain.Contract-object from a given row returned from the database"""
 		contract_id = row[0]
 		name = row[1]
-
-		if row[2] <> None:
-			start = dateutil.parser.parse(row[2]).date()
-		else:
-			start = None
-
-		if row[3] <> None:
-			end = dateutil.parser.parse(row[3]).date()
-		else:
-			end = None
-
+		start = self._sql_datetime_to_python(row[2])
+		end = self._sql_datetime_to_python(row[3])
 		hours = row[4]
 
 		contract = Contract(contract_id, name, start, end, hours)
 		return contract
 
-	def _update_contract_from_row(self, row, contract):
-		contract.name = row[1]
-		contract.start = dateutil.parser.parse(row[2]).date()
-		contract.end = dateutil.parser.parse(row[3]).date()
-		contract.hours = row[4]
-	
-		return contract
+	def _python_datetime_to_sql(self, datetime):
+		"""Returns a parameter fit for passing to sqlite3.cursor.execute(query,...)
 		
+		If datetime is None, it returns None. Otherwise it returns a string-representation
+		of the datetime-object."""
+		
+		if datetime <> None:
+			return str(datetime)
+		else:
+			return None
+		
+	def _sql_datetime_to_python(self, sql_entry):
+		"""Creates a python object from an entry returned from a database
+		
+		If the returned entry is None, None is returned. Otherwise, the entry
+		is parsed and encapsulated in a datetime-object"""
+		
+		if sql_entry <> None:
+			return dateutil.parser.parse(sql_entry)
+		else:
+			return None

@@ -1,13 +1,13 @@
-from domain import *
+from domain import Project
 
 class ProjectController:
 	def __init__(self, db_connection, contract_controller):
+		# TODO: Comment
 		self._db_connection = db_connection
 		self._contract_controller = contract_controller
 
-		self._project_dict = dict()
-
-	def add_project(self, name, contract):
+	def create_project(self, name, contract):
+		"""Stores a new project in the database and returns it to the caller"""
 		db_cursor = self._db_connection.cursor()
 
 		query = "INSERT INTO Projects (Name, ContractId) VALUES (?, ?)"
@@ -20,35 +20,72 @@ class ProjectController:
 
 		return project
 
-	def get_all_projects_dict(self):
-		contract_dict = self._contract_controller.get_all_contracts_dict()
+	def retrieve_all_projects(self, contract_dict):
+		"""Returns a dictionary containing all projects in the database
+		
+		The returned dictionary maps project_ids to their respective project"""
+		
+		# Initialize return value
+		return_value = {}
 
+		# Query database
 		db_cursor = self._db_connection.cursor()
 		query = "SELECT * FROM Projects"
 		db_cursor.execute(query)
 
+		# Process the retrieved rows and create business objects from them
 		for row in db_cursor.fetchall():
 			project_id = row[0]
+			project = self._create_project_from_row(row, contract_dict)
+			return_value[project_id] = project
 
-			if project_id in self._project_dict:
-				project = self._update_project_from_row(row, contract_dict, self._project_dict[project_id])
-			else:
-				project = self._create_project_from_row(row, contract_dict)
+		return return_value
+	
+	def retrieve_project_by_id(self, project_id):
+		"""Returns the project with the given id, if it exists in the database.
+		
+		If there is no project with the given id, None is returned"""
+		contract_dict = self._contract_controller.get_all_contracts_dict()
 
-			self._project_dict[project.project_id] = project
+		db_cursor = self._db_connection.cursor()
 
-		return self._project_dict
+		query = "SELECT * FROM Projects WHERE ProjectId = ?"
+		db_cursor.execute(query, project_id)
+		
+		results = db_cursor.fetchall()
+		if len(results) <> 1:
+			return_value = None
+		else:
+			return_value = self._create_project_from_row(results[0], contract_dict)
+
+		return return_value
+
+	def update_project(self, project):
+		"""Writes the changes made in the given project to the database"""
+		db_cursor = self._db_connection.cursor()
+		
+		query = "UPDATE Projects SET (name = ?, contract_id = ?) WHERE project_id = ?"
+		db_cursor.execute(query, project.name, project.contract.contract_id, project.project_id)
+		
+	def delete_project(self, project):
+		"""Removes the given project from the database.
+		
+		The given project is considered invalid after a call to this method"""
+		db_cursor = self._db_connection.cursor()
+		
+		query = "DELETE FROM Projects WHERE ProjectId = ?"
+		db_cursor.execute(query, project.project_id)
+		
+		self._db_connection.commit()
 
 	def _create_project_from_row(self, row, contract_dict):
+		"""Creates a domain.Project object from a row returned from a database query
+		
+		The contract_dict shall map contract_id to the contract with the given id.
+		It may, for example, be obtained from some ContractController"""
 		project_id = row[0]
 		name = row[1]
 		contract_id = row[2]
 
 		project = Project(project_id, name, contract_dict[contract_id])
-		return project
-		
-	def _update_project_from_row(self, row, contract_dict, project):
-		project.name = row[1]
-		project.contract = contract_dict[row[2]]
-
 		return project
