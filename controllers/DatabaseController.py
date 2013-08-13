@@ -44,11 +44,11 @@ class DatabaseController:
 
 		self._db_connection.commit()
 
-		self.contract_controller = ContractController(self._db_connection)
-		self.category_controller = CategoryController(self._db_connection)
+		self._contract_controller = ContractController(self._db_connection)
+		self._category_controller = CategoryController(self._db_connection)
 
-		self.project_controller = ProjectController(self._db_connection, self.contract_controller)
-		self.worktime_controller = WorktimeController(self._db_connection, self.project_controller, self.contract_controller)
+		self._project_controller = ProjectController(self._db_connection, self._contract_controller)
+		self._worktime_controller = WorktimeController(self._db_connection, self._project_controller, self._contract_controller)
 
 		# CRUD-interface for contracts
 		def create_contract(self, name, start, end, hours):
