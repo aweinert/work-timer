@@ -36,10 +36,8 @@ class WorktimeController:
 		return worktime
 
 	def retrieve_all_worktimes(self):
-		"""Returns a dictionary containing all worktimes in the database
-		
-		The returned dictionary maps worktime_ids to their respective worktime"""
-		return_value = {}
+		"""Returns a list containing all worktimes in the database"""
+		return_value = []
 
 		project_dict = self._project_controller.get_all_projects_dict()
 		category_dict = self._category_controller.get_all_categories_dict()
@@ -49,9 +47,8 @@ class WorktimeController:
 		db_cursor.execute(query)
 
 		for row in db_cursor.fetchall():
-			worktime_id = row[0]
 			worktime = self._create_worktime_from_row(row, project_dict, category_dict)
-			return_value[worktime_id] = worktime
+			return_value.append(worktime)
 
 		return return_value
 

@@ -20,12 +20,9 @@ class ProjectController:
 		return project
 
 	def retrieve_all_projects(self, contract_dict):
-		"""Returns a dictionary containing all projects in the database
-		
-		The returned dictionary maps project_ids to their respective project"""
-		
+		"""Returns a list containing all projects in the database"""
 		# Initialize return value
-		return_value = {}
+		return_value = []
 
 		# Query database
 		db_cursor = self._db_connection.cursor()
@@ -34,9 +31,8 @@ class ProjectController:
 
 		# Process the retrieved rows and create business objects from them
 		for row in db_cursor.fetchall():
-			project_id = row[0]
 			project = self._create_project_from_row(row, contract_dict)
-			return_value[project_id] = project
+			return_value.append(project)
 
 		return return_value
 	

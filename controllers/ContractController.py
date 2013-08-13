@@ -22,12 +22,9 @@ class ContractController:
 		return contract
 
 	def retrieve_all_contracts(self):
-		"""Returns a dictionary containing all contracts in the database
-		
-		The returned dictionary maps contract_ids to their respective contract"""
-
+		"""Returns a list containing all contracts in the database"""
 		# Initialize return_value
-		return_value = {}
+		return_value = []
 
 		# Actually query database
 		db_cursor = self._db_connection.cursor()
@@ -37,7 +34,7 @@ class ContractController:
 		# Create objects from returned rows
 		for row in db_cursor.fetchall():
 			contract = self._create_contract_from_row(row)
-			return_value[contract.contract_id] = contract
+			return_value.append(contract)
 
 		return return_value
 	

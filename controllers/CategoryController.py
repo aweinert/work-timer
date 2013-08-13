@@ -19,10 +19,8 @@ class CategoryController:
 		return category
 
 	def retrieve_all_categories(self):
-		"""Returns a dictionary containing all categories in the database
-		
-		The returned dictionary maps category_ids to their respective category"""
-		return_value = {}
+		"""Returns a list containing all categories in the database"""
+		return_value = []
 		
 		db_cursor = self._db_connection.cursor()
 		query = "SELECT * FROM Categories"
@@ -30,7 +28,7 @@ class CategoryController:
 
 		for row in db_cursor.fetchall():
 			category = self._create_category_from_row(row)
-			return_value[category.category_id] = category
+			return_value.append(category)
 
 		return return_value
 	
