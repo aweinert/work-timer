@@ -2,12 +2,11 @@ from domain import *
 
 class CategoryController:
 	def __init__(self, db_connection):
-		# TODO: Comment
 		self._db_connection = db_connection
 		self._categories_dict = dict()
 
 	def create_category(self, name):
-		# TODO: Comment
+		"""Stores a new category-domain object and returns it to the caller"""
 		db_cursor = self._db_connection.cursor()
 
 		query = "INSERT INTO Categories (Name) VALUES (?)"
@@ -73,15 +72,9 @@ class CategoryController:
 		self._db_connection.commit()
 
 	def _create_category_from_row(self, row):
-		# TODO: Comment
+		"""Creates a category-domain object from the result of an SQL-query"""
 		category_id = row[0]
 		name = row[1]
 
 		category = Category(category_id, name)
-		return category
-
-	def _update_category_from_row(self, row, category):
-		# TODO: Comment
-		category.name = row[1]
-
 		return category
