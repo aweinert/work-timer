@@ -1,5 +1,5 @@
 from WorktimeController import *
 from ProjectController import *
-from DatabaseController import *
+from PersistenceController import *
 from ContractController import *
 from CategoryController import *
