@@ -19,7 +19,7 @@ class ProjectController:
 
 		return project
 
-	def retrieve_all_projects(self, contract_dict):
+	def retrieve_all_projects(self):
 		"""Returns a list containing all projects in the database"""
 		# Initialize return value
 		return_value = []
@@ -40,8 +40,6 @@ class ProjectController:
 		"""Returns the project with the given id, if it exists in the database.
 		
 		If there is no project with the given id, None is returned"""
-		contract_dict = self._contract_controller.get_all_contracts_dict()
-
 		db_cursor = self._db_connection.cursor()
 
 		query = "SELECT * FROM Projects WHERE ProjectId = ?"
