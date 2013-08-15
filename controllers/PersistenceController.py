@@ -58,11 +58,11 @@ class PersistenceController:
 
 		self._db_connection.commit()
 
-		self._contract_controller = ContractController(self._db_connection)
-		self._category_controller = CategoryController(self._db_connection)
+		self._contract_controller = ContractController(self._db_connection, self)
+		self._category_controller = CategoryController(self._db_connection, self)
 
-		self._project_controller = ProjectController(self._db_connection, self._contract_controller)
-		self._worktime_controller = WorktimeController(self._db_connection, self._project_controller, self._contract_controller)
+		self._project_controller = ProjectController(self._db_connection, self)
+		self._worktime_controller = WorktimeController(self._db_connection, self)
 		
 		self._contracts = self._create_and_populate_cache(self._contract_controller.retrieve_all_contracts,
 														lambda contract: contract.contract_id,
