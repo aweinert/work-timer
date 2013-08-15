@@ -4,12 +4,9 @@ import datetime
 from domain import *
 
 class WorktimeController:
-	def __init__(self, db_connection, project_controller, contract_controller):
+	def __init__(self, db_connection, persistence_controller):
 		self._db_connection = db_connection
-		self._project_controller = project_controller
-		self._contract_controller = contract_controller
-
-		self._worktime_dict = dict()
+		self._persistence_controller = persistence_controller
 
 	def create_worktime(self, project, category, start, end, description):
 		"""Writes a new domain-worktime object to the database and returns it to the caller"""
@@ -39,15 +36,12 @@ class WorktimeController:
 		"""Returns a list containing all worktimes in the database"""
 		return_value = []
 
-		project_dict = self._project_controller.get_all_projects_dict()
-		category_dict = self._category_controller.get_all_categories_dict()
-
 		db_cursor = self._db_connection.cursor()
 		query = "SELECT * FROM Times"
 		db_cursor.execute(query)
 
 		for row in db_cursor.fetchall():
-			worktime = self._create_worktime_from_row(row, project_dict, category_dict)
+			worktime = self._create_worktime_from_row(row)
 			return_value.append(worktime)
 
 		return return_value
@@ -56,9 +50,6 @@ class WorktimeController:
 		"""Returns the worktime with the given id, if it exists in the database.
 		
 		If there is no worktime with the given id, None is returned"""
-		project_dict = self._project_controller.get_all_projects_dict()
-		category_dict = self._category_controller.get_all_categories_dict()
-
 		db_cursor = self._db_connection.cursor()
 		query = "SELECT * FROM Times WHERE TimeId = ?"
 		db_cursor.execute(query, worktime_id)
@@ -68,7 +59,7 @@ class WorktimeController:
 		if len(results) <> 1:
 			return_value = None
 		else:
-			return_value = self._create_worktime_from_row(results[0], project_dict, category_dict)
+			return_value = self._create_worktime_from_row(results[0])
 
 		return return_value
 	
@@ -92,7 +83,7 @@ class WorktimeController:
 		self._db_connection.commit()
 		
 
-	def _create_worktime_from_row(self, row, project_dict, category_dict):
+	def _create_worktime_from_row(self, row):
 		"""Creates a domain.Worktime object from a row returned from a database query
 		
 		The dictionaries shall map the ids of their objects to the object with the given id.
@@ -112,6 +103,9 @@ class WorktimeController:
 			end = None
 
 		description = row[5]
+		
+		project = self._persistence_controller.retrieve_project_by_id(project_id)
+		category = self._persistence_controller.retrieve_category_by_id(category_id)
 
-		worktime = Worktime(time_id, project_dict[project_id], category_dict[category_id], start, end, description)
+		worktime = Worktime(time_id, project, category, start, end, description)
 		return worktime

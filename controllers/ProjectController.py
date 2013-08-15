@@ -1,9 +1,9 @@
 from domain import Project
 
 class ProjectController:
-	def __init__(self, db_connection, contract_controller):
+	def __init__(self, db_connection, persistence_controller):
 		self._db_connection = db_connection
-		self._contract_controller = contract_controller
+		self._persistence_controller = persistence_controller
 
 	def create_project(self, name, contract):
 		"""Stores a new project in the database and returns it to the caller"""
@@ -31,7 +31,7 @@ class ProjectController:
 
 		# Process the retrieved rows and create business objects from them
 		for row in db_cursor.fetchall():
-			project = self._create_project_from_row(row, contract_dict)
+			project = self._create_project_from_row(row)
 			return_value.append(project)
 
 		return return_value
@@ -51,7 +51,7 @@ class ProjectController:
 		if len(results) <> 1:
 			return_value = None
 		else:
-			return_value = self._create_project_from_row(results[0], contract_dict)
+			return_value = self._create_project_from_row(results[0])
 
 		return return_value
 
@@ -73,7 +73,7 @@ class ProjectController:
 		
 		self._db_connection.commit()
 
-	def _create_project_from_row(self, row, contract_dict):
+	def _create_project_from_row(self, row):
 		"""Creates a domain.Project object from a row returned from a database query
 		
 		The contract_dict shall map contract_id to the contract with the given id.
@@ -81,6 +81,7 @@ class ProjectController:
 		project_id = row[0]
 		name = row[1]
 		contract_id = row[2]
+		contract = self._persistence_controller.retrieve_contract_by_id(contract_id)
 
-		project = Project(project_id, name, contract_dict[contract_id])
+		project = Project(project_id, name, contract)
 		return project

@@ -3,9 +3,9 @@ import dateutil.parser
 from domain import *
 
 class ContractController:
-	def __init__(self, db_connection):
+	def __init__(self, db_connection, persistence_controller):
 		self._db_connection = db_connection
-		self._contracts_dict = dict()
+		self._persistence_controller = persistence_controller
 
 	def create_contract(self, name, start, end, hours):
 		"""Writes a new domain-contract object and returns it to the caller"""

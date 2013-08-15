@@ -1,9 +1,9 @@
 from domain import *
 
 class CategoryController:
-	def __init__(self, db_connection):
+	def __init__(self, db_connection, persistence_controller):
 		self._db_connection = db_connection
-		self._categories_dict = dict()
+		self._persistence_controller = persistence_controller
 
 	def create_category(self, name):
 		"""Stores a new category-domain object and returns it to the caller"""
