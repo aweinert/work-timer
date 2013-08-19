@@ -1,4 +1,4 @@
-import controllers
+import persistence_layer
 import datetime
 
 # Constants
@@ -19,7 +19,7 @@ def create_controller(default_path = "work.db"):
     if path == "":
         path = default_path
         
-    return controllers.PersistenceController(path)
+    return persistence_layer.PersistenceController(path)
 
 def show_menu():
     configuration = {
