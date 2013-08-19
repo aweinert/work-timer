@@ -1,5 +1,6 @@
 import persistence_layer
 import datetime
+import dateutil
 
 # Constants
 SCREEN_WIDTH = 80
@@ -61,15 +62,26 @@ def stop_work(controller):
         controller.update_worktime(time)
 
 def enter_contract(controller):
-    pass
+    name = input("Please enter name of new contract: ")
+    start = dateutil.parser.parse(input("Please enter first day of new contract: ")).date()
+    end = dateutil.parser.parse(input("Please enter last day of new contract: ")).date()
+    hours = int(input("Please enter hours per week: "))
+    
+    controller.create_contract(name, start, end, hours)
 
 def enter_project(controller):
-    pass
+    contract = choose_domain_object("Please choose a contract for this project: ", controller.retrieve_all_contracts)
+    name = input("Please enter a name for this project: ")
+    
+    controller.create_project(name, contract)
 
 def enter_category(controller):
-    pass
+    name = input("Please enter name of category: ")
+    
+    controller.create_category(name)
 
 def show_info(controller):
+    # TODO: Implement
     pass
 
 def choose_domain_object(query_string, getter_function):
