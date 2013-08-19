@@ -1,11 +1,8 @@
 import sqlite3
 
-from ContractController import *
-from CategoryController import *
-from ProjectController import *
-from WorktimeController import *
+import database_controllers
 
-class CachedStore:
+class _CachedStore:
 	"""Retrieves elements via some function and caches them after the first retrieval"""
 	def __init__(self, id_func, loader_func):
 		"""Initializes a cached store for a certain kind of objects
@@ -58,11 +55,11 @@ class PersistenceController:
 
 		self._db_connection.commit()
 
-		self._contract_controller = ContractController(self._db_connection, self)
-		self._category_controller = CategoryController(self._db_connection, self)
+		self._contract_controller = database_controllers.ContractController(self._db_connection, self)
+		self._category_controller = database_controllers.CategoryController(self._db_connection, self)
 
-		self._project_controller = ProjectController(self._db_connection, self)
-		self._worktime_controller = WorktimeController(self._db_connection, self)
+		self._project_controller = database_controllers.ProjectController(self._db_connection, self)
+		self._worktime_controller = database_controllers.WorktimeController(self._db_connection, self)
 		
 		self._contracts = self._create_and_populate_cache(self._contract_controller.retrieve_all_contracts,
 														lambda contract: contract.contract_id,
@@ -157,9 +154,8 @@ class PersistenceController:
 		self._times.delete(worktime)
 	
 	def _create_and_populate_cache(self, creator_func, id_func, loader_func):
-		return_value = CachedStore(id_func, loader_func)
+		return_value = _CachedStore(id_func, loader_func)
 		for obj in creator_func():
 			return_value.store(obj)
 			
 		return return_value
-				
