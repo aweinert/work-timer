@@ -7,7 +7,7 @@ class Contract:
 		self.hours = hours
 		
 	def __str__(self):
-		return self.name + ", " + self._hours + "(" + str(self.start) + " - " + str(self.end) + ")"
+		return self.name + ", " + str(self.hours) + "h (" + str(self.start) + " - " + str(self.end) + ")"
 
 class Project:
 	def __init__(self, project_id, name, contract):

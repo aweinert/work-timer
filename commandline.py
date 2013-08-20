@@ -10,7 +10,7 @@ def print_horizontal_line(width = SCREEN_WIDTH):
     
 def print_title():
     print_horizontal_line()
-    print "Worktime Bookeeping".capitalize().center(SCREEN_WIDTH)
+    print "Worktime Bookkeeping".capitalize().center(SCREEN_WIDTH)
     print_horizontal_line()
     print ""
     
@@ -62,21 +62,21 @@ def stop_work(controller):
         controller.update_worktime(time)
 
 def enter_contract(controller):
-    name = input("Please enter name of new contract: ")
-    start = dateutil.parser.parse(input("Please enter first day of new contract: ")).date()
-    end = dateutil.parser.parse(input("Please enter last day of new contract: ")).date()
-    hours = int(input("Please enter hours per week: "))
+    name = raw_input("Please enter name of new contract: ")
+    start = dateutil.parser.parse(raw_input("Please enter first day of new contract: ")).date()
+    end = dateutil.parser.parse(raw_input("Please enter last day of new contract: ")).date()
+    hours = int(raw_input("Please enter hours per week: "))
     
     controller.create_contract(name, start, end, hours)
 
 def enter_project(controller):
-    contract = choose_domain_object("Please choose a contract for this project: ", controller.retrieve_all_contracts)
-    name = input("Please enter a name for this project: ")
+    contract = choose_domain_object("Please choose a contract for this project", controller.retrieve_all_contracts)
+    name = raw_input("Please enter a name for this project: ")
     
     controller.create_project(name, contract)
 
 def enter_category(controller):
-    name = input("Please enter name of category: ")
+    name = raw_input("Please enter name of category: ")
     
     controller.create_category(name)
 

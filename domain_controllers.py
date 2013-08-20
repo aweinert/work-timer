@@ -156,8 +156,8 @@ class ContractController:
 		"""Creates a domain.Contract-object from a given row returned from the database"""
 		contract_id = row[0]
 		name = row[1]
-		start = self._sql_datetime_to_python(row[2])
-		end = self._sql_datetime_to_python(row[3])
+		start = self._sql_datetime_to_python(row[2]).date()
+		end = self._sql_datetime_to_python(row[3]).date()
 		hours = row[4]
 
 		contract = Contract(contract_id, name, start, end, hours)

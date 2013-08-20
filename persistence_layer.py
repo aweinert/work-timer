@@ -1,6 +1,6 @@
 import sqlite3
 
-import database_controllers
+import domain_controllers
 
 class _CachedStore:
 	"""Retrieves elements via some function and caches them after the first retrieval"""
@@ -55,11 +55,11 @@ class PersistenceController:
 
 		self._db_connection.commit()
 
-		self._contract_controller = database_controllers.ContractController(self._db_connection, self)
-		self._category_controller = database_controllers.CategoryController(self._db_connection, self)
+		self._contract_controller = domain_controllers.ContractController(self._db_connection, self)
+		self._category_controller = domain_controllers.CategoryController(self._db_connection, self)
 
-		self._project_controller = database_controllers.ProjectController(self._db_connection, self)
-		self._worktime_controller = database_controllers.WorktimeController(self._db_connection, self)
+		self._project_controller = domain_controllers.ProjectController(self._db_connection, self)
+		self._worktime_controller = domain_controllers.WorktimeController(self._db_connection, self)
 		
 		self._contracts = self._create_and_populate_cache(self._contract_controller.retrieve_all_contracts,
 														lambda contract: contract.contract_id,
