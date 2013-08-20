@@ -118,6 +118,8 @@ def choose_domain_object(query_string, getter_function):
     
     choice = raw_input(query_string + " (1): ")
     
+    print ""
+    
     if choice == "":
         choice = "1"
         
