@@ -1,8 +1,55 @@
 import persistence_layer
+import datetime
 
 class _AnalysisController:
     def __init__(self, persistence_controller):
         self._persistence_controller = persistence_controller
+        
+    def get_time_worked_to_today(self, contract):
+        return self.get_hours_worked(contract, datetime.date.today())
+
+    def get_time_to_work_to_today(self, contract):
+        return self.get_hours_to_work(contract, datetime.date.today())
+        
+    def get_hours_worked(self, contract, date):
+        """Returns the time in hours that actually was invested in the given
+        contract from its beginning to the given date"""
+        worktimes = self._persistence_controller.retrieve_all_worktimes()
+        
+        time_worked = 0
+        for worktime in filter(lambda x: x.project.contract == contract, worktimes):
+            if worktime.end.date() <= date:
+                worktime_duration = worktime.get_duration()
+                time_worked += (worktime_duration.days * 24 + float(worktime_duration.seconds) / (60.0 * 60.0 * 24.0))
+                
+        return time_worked
+    
+    def get_hours_to_work(self, contract, date):
+        """Gets the time in hours that should have been worked for the given
+        contract up to the given day."""
+        start_date = contract.start
+        
+        WORK_DAYS_PER_WEEK = 5
+        hours_per_day = contract.hours / WORK_DAYS_PER_WEEK
+        
+        if date <= contract.end:
+            end_date = date
+        else:
+            end_date = contract.end
+            
+        hours_to_work = 0
+        # There should be a way to specify a timedelta of one day directly...
+        ONE_DAY_TIMEDELTA = datetime.date(1,1,2) - datetime.date(1,1,1)
+        current_date = start_date
+        
+        while current_date <= end_date:
+            # Exclude weekends, i.e., the fifth and sixth day of the week
+            if current_date.weekday() <> 5 and current_date.weekday() <> 6:
+                hours_to_work += hours_per_day
+
+            current_date += ONE_DAY_TIMEDELTA
+        
+        return hours_to_work
 
 class _CrudController:
     def __init__(self, persistence_controller):
