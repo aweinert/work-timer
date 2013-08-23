@@ -1,10 +1,10 @@
 import persistence_layer
 
-class AnalysisController:
+class _AnalysisController:
     def __init__(self, persistence_controller):
         self._persistence_controller = persistence_controller
 
-class CrudController:
+class _CrudController:
     def __init__(self, persistence_controller):
         self._persistence_controller = persistence_controller
 
@@ -74,5 +74,5 @@ class CrudController:
 class LogicController:
     def __init__(self, db_path = "work.db"):
         self._persistence_controller = persistence_layer.PersistenceController(db_path)
-        self.crud_controller = CrudController(self._persistence_controller)
-        self.analysis_controller = AnalysisController(self._persistence_controller)
+        self.crud_controller = _CrudController(self._persistence_controller)
+        self.analysis_controller = _AnalysisController(self._persistence_controller)
