@@ -1,4 +1,4 @@
-import persistence_layer
+import logic_layer
 import datetime
 import dateutil
 
@@ -57,7 +57,7 @@ class _Screen:
 class CommandlineInterface:
     def __init__(self):
         self._screen = _Screen()
-        self._persistence_controller = self._create_controller()
+        self._logic_controller = self._create_controller()
 
     def _create_controller(self, default_path = "work.db"):
         path = self._screen.read_string("Please enter path to database (" + default_path + "): ", "")
@@ -65,7 +65,7 @@ class CommandlineInterface:
         if path == "":
             path = default_path
             
-        return persistence_layer.PersistenceController(path)
+        return logic_layer.LogicController(path)
 
     def run(self):
         self._screen.print_title("Worktime Bookkeping".capitalize())
@@ -97,19 +97,19 @@ class CommandlineInterface:
         description = self._screen.read_string("Please enter a short description: ")
         start_time = datetime.datetime.now()
     
-        self._persistence_controller.create_worktime(project, category, start_time, None, description)
+        self._logic_controller.crud_controller.create_worktime(project, category, start_time, None, description)
 
     def _stop_work(self):
-        worktimes = self._persistence_controller.retrieve_all_worktimes()
+        worktimes = self._logic_controller.crud_controller.retrieve_all_worktimes()
         running_worktimes = filter(lambda time: time.end == None, worktimes)
         
         for time in running_worktimes:
             time.end = datetime.datetime.now()
-            self._persistence_controller.update_worktime(time)
+            self._logic_controller.crud_controller.update_worktime(time)
         
     def _enter_work(self):
-        project = self._choose_domain_object("Please choose a project", self._persistence_controller.retrieve_all_projects)
-        category = self._choose_domain_object("Please choose a category", self._persistence_controller.retrieve_all_categories)
+        project = self._choose_domain_object("Please choose a project", self._logic_controller.crud_controller.retrieve_all_projects)
+        category = self._choose_domain_object("Please choose a category", self._logic_controller.crud_controller.retrieve_all_categories)
         description = self._screen.read_string("Please enter a short description: ")
         
         start_date = dateutil.parser.parse(self._screen.read_string("Please enter the start date of the work: ")).date()
@@ -126,7 +126,7 @@ class CommandlineInterface:
     
         end = datetime.datetime(end_date.year, end_date.month, end_date.day, end_time.hour, end_time.minute, end_time.second, end_time.microsecond)
         
-        self._persistence_controller.create_worktime(project, category, start, end, description)
+        self._logic_controller.crud_controller.create_worktime(project, category, start, end, description)
 
     def _enter_contract(self):
         name = self._screen.read_string("Please enter name of new contract: ")
@@ -134,18 +134,18 @@ class CommandlineInterface:
         end = dateutil.parser.parse(self._screen.read_string("Please enter last day of new contract: ")).date()
         hours = int(self._screen.read_string("Please enter hours per week: "))
     
-        self._persistence_controller.create_contract(name, start, end, hours)
+        self._logic_controller.crud_controller.create_contract(name, start, end, hours)
 
     def _enter_project(self):
-        contract = self._choose_domain_object("Please choose a contract for this project", self._persistence_controller.retrieve_all_contracts)
+        contract = self._choose_domain_object("Please choose a contract for this project", self._logic_controller.crud_controller.retrieve_all_contracts)
         name = self._screen.read_string("Please enter a name for this project: ")
         
-        self._persistence_controller.create_project(name, contract)
+        self._logic_controller.crud_controller.create_project(name, contract)
 
     def _enter_category(self):
         name = self._screen.read_string("Please enter name of category: ")
         
-        self._persistence_controller.create_category(name)
+        self._logic_controller.crud_controller.create_category(name)
 
     def _show_info(self):
         # TODO: Implement
