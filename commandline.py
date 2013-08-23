@@ -61,6 +61,10 @@ class CommandlineInterface:
 
     def _create_controller(self, default_path = "work.db"):
         path = self._screen.read_string("Please enter path to database (" + default_path + "): ", "")
+        
+        if path == "":
+            path = default_path
+            
         return persistence_layer.PersistenceController(path)
 
     def run(self):
