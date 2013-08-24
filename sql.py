@@ -60,6 +60,11 @@ class Database:
         self._execute_query(cursor, query, arguments)
         self._db_connection.commit()
 
+    def create_table(self, query):
+        """Executes the given query and commits the results"""
+        cursor = self._db_connection.cursor()
+        self._execute_query(cursor, query)
+        self._db_connection.commit()
             
     def _execute_query(self, cursor, query, arguments):
         if arguments <> None:
