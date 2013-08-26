@@ -1,4 +1,4 @@
-from domain import *
+import domain
 
 class CategoryController:
 	def __init__(self, db_connection, persistence_controller):
@@ -10,7 +10,7 @@ class CategoryController:
 		query = "INSERT INTO Categories (Name) VALUES (?)"
 		category_id = self._db_connection.insert_single_row(query, [name])
 
-		category = Category(category_id, name)
+		category = domain.Category(category_id, name)
 		return category
 
 	def retrieve_all_categories(self):
@@ -46,7 +46,7 @@ class CategoryController:
 		category_id = row[0]
 		name = row[1]
 
-		category = Category(category_id, name)
+		category = domain.Category(category_id, name)
 		return category
 
 class ContractController:
@@ -59,7 +59,7 @@ class ContractController:
 		query = "INSERT INTO Contracts(Name, Start, End, Hours) Values(?,?,?,?)"
 		contract_id = self._db_connection.create_single_row(query, [name, self._db_connection.python_datetime_to_sql(start), self._db_connection.python_datetime_to_sql(end), hours])
 
-		contract = Contract(contract_id, name, str(start), str(end), hours)
+		contract = domain.Contract(contract_id, name, str(start), str(end), hours)
 
 		return contract
 
@@ -95,7 +95,7 @@ class ContractController:
 		end = self._db_connection.sql_datetime_to_python(row[3]).date()
 		hours = row[4]
 
-		contract = Contract(contract_id, name, start, end, hours)
+		contract = domain.Contract(contract_id, name, start, end, hours)
 		return contract
 
 class ProjectController:
@@ -108,7 +108,7 @@ class ProjectController:
 		query = "INSERT INTO Projects (Name, ContractId) VALUES (?, ?)"
 		project_id = self._db_connection.create_single_row(query, [name, contract.contract_id])
 
-		project = Project(project_id, name, contract)
+		project = domain.Project(project_id, name, contract)
 
 		return project
 
@@ -148,7 +148,7 @@ class ProjectController:
 		contract_id = row[2]
 		contract = self._persistence_controller.retrieve_contract_by_id(contract_id)
 
-		project = Project(project_id, name, contract)
+		project = domain.Project(project_id, name, contract)
 		return project
 
 class WorktimeController:
@@ -161,7 +161,7 @@ class WorktimeController:
 		query = "INSERT INTO Times (ProjectId, CategoryId, Start, End, Description) VALUES (?,?,?,?,?)"
 		worktime_id = self._db_connection.insert_single_row(query, [project.project_id, category.category_id, self._db_connection.python_datetime_to_sql(start), self._db_connection.python_datetime_to_sql(end), description])
 
-		worktime = Worktime(worktime_id, project.project_id, category.category_id, start, end, description)
+		worktime = domain.Worktime(worktime_id, project.project_id, category.category_id, start, end, description)
 
 		return worktime
 
@@ -205,5 +205,5 @@ class WorktimeController:
 		project = self._persistence_controller.retrieve_project_by_id(project_id)
 		category = self._persistence_controller.retrieve_category_by_id(category_id)
 
-		worktime = Worktime(time_id, project, category, start, end, description)
+		worktime = domain.Worktime(time_id, project, category, start, end, description)
 		return worktime
