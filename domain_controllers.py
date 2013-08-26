@@ -1,5 +1,3 @@
-import dateutil.parser
-
 from domain import *
 
 class CategoryController:
@@ -59,7 +57,7 @@ class ContractController:
 	def create_contract(self, name, start, end, hours):
 		"""Writes a new domain-contract object and returns it to the caller"""
 		query = "INSERT INTO Contracts(Name, Start, End, Hours) Values(?,?,?,?)"
-		contract_id = self._db_connection.create_single_row(query, [name, self._python_datetime_to_sql(start), self._python_datetime_to_sql(end), hours])
+		contract_id = self._db_connection.create_single_row(query, [name, self._db_connection.python_datetime_to_sql(start), self._db_connection.python_datetime_to_sql(end), hours])
 
 		contract = Contract(contract_id, name, str(start), str(end), hours)
 
@@ -80,7 +78,7 @@ class ContractController:
 	
 	def update_contract(self, contract):
 		query = "UPDATE Contracts SET (name = ?, start = ?, end = ?, hours = ?) WHERE contract_id = ?"
-		self._db_connection.update_rows(query, [contract.name, self._python_datetime_to_sql(contract.start), self._python_datetime_to_sql(contract.end), contract.hours, contract.contract_id])
+		self._db_connection.update_rows(query, [contract.name, self._db_connection.python_datetime_to_sql(contract.start), self._db_connection.python_datetime_to_sql(contract.end), contract.hours, contract.contract_id])
 		
 	def delete_contract(self, contract):
 		"""Removes the given contract from the database.
@@ -93,34 +91,12 @@ class ContractController:
 		"""Creates a domain.Contract-object from a given row returned from the database"""
 		contract_id = row[0]
 		name = row[1]
-		start = self._sql_datetime_to_python(row[2]).date()
-		end = self._sql_datetime_to_python(row[3]).date()
+		start = self._db_connection.sql_datetime_to_python(row[2]).date()
+		end = self._db_connection.sql_datetime_to_python(row[3]).date()
 		hours = row[4]
 
 		contract = Contract(contract_id, name, start, end, hours)
 		return contract
-
-	def _python_datetime_to_sql(self, datetime):
-		"""Returns a parameter fit for passing to sqlite3.cursor.execute(query,...)
-		
-		If datetime is None, it returns None. Otherwise it returns a string-representation
-		of the datetime-object."""
-		
-		if datetime <> None:
-			return str(datetime)
-		else:
-			return None
-		
-	def _sql_datetime_to_python(self, sql_entry):
-		"""Creates a python object from an entry returned from a database
-		
-		If the returned entry is None, None is returned. Otherwise, the entry
-		is parsed and encapsulated in a datetime-object"""
-		
-		if sql_entry <> None:
-			return dateutil.parser.parse(sql_entry)
-		else:
-			return None
 
 class ProjectController:
 	def __init__(self, db_connection, persistence_controller):
@@ -182,18 +158,8 @@ class WorktimeController:
 
 	def create_worktime(self, project, category, start, end, description):
 		"""Writes a new domain-worktime object to the database and returns it to the caller"""
-		if start <> None:
-			start_param = str(start)
-		else:
-			start_param = None
-
-		if end <> None:
-			end_param = str(end)
-		else:
-			end_param = None
-
 		query = "INSERT INTO Times (ProjectId, CategoryId, Start, End, Description) VALUES (?,?,?,?,?)"
-		worktime_id = self._db_connection.insert_single_row(query, [project.project_id, category.category_id, start_param, end_param, description])
+		worktime_id = self._db_connection.insert_single_row(query, [project.project_id, category.category_id, self._db_connection.python_datetime_to_sql(start), self._db_connection.python_datetime_to_sql(end), description])
 
 		worktime = Worktime(worktime_id, project.project_id, category.category_id, start, end, description)
 
@@ -232,17 +198,8 @@ class WorktimeController:
 		time_id = row[0]
 		project_id = row[1]
 		category_id = row[2]
-
-		if row[3] <> None:
-			start = dateutil.parser.parse(row[3])
-		else:
-			start = None
-
-		if row[4] <> None:
-			end = dateutil.parser.parse(row[4])
-		else:
-			end = None
-
+		start = self._db_connection.sql_datetime_to_python(row[3])
+		end = self._db_connection.sql_datetime_to_python(row[4])
 		description = row[5]
 		
 		project = self._persistence_controller.retrieve_project_by_id(project_id)
