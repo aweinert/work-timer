@@ -1,4 +1,4 @@
-import sqlite3
+import sql
 
 import domain_controllers
 
@@ -45,15 +45,12 @@ class _CachedStore:
 
 class PersistenceController:
 	def __init__(self, db_path):
-		self._db_connection = sqlite3.connect(db_path)
-		cursor = self._db_connection.cursor()
+		self._db_connection = sql.Database(db_path)
 
-		cursor.execute("CREATE TABLE IF NOT EXISTS Contracts (ContractId INTEGER PRIMARY KEY, Name TEXT, Start DATE, End DATE, Hours INTEGER)")
-		cursor.execute("CREATE TABLE IF NOT EXISTS Projects (ProjectId INTEGER PRIMARY KEY, Name TEXT, ContractId INTEGER REFERENCES Contracts(ContractId))")
-		cursor.execute("CREATE TABLE IF NOT EXISTS Categories (CategoryId INTEGER PRIMARY KEY, Name TEXT)")
-		cursor.execute("CREATE TABLE IF NOT EXISTS Times (TimeId INTEGER PRIMARY KEY, ProjectId INTEGER REFERENCES Projects(ProjectId), CategoryId INTEGER REFERENCES Categories(CategoryId), Start DATETIME, End DATETIME, Description TEXT)")
-
-		self._db_connection.commit()
+		self._db_connection.create_table("CREATE TABLE IF NOT EXISTS Contracts (ContractId INTEGER PRIMARY KEY, Name TEXT, Start DATE, End DATE, Hours INTEGER)")
+		self._db_connection.create_table("CREATE TABLE IF NOT EXISTS Projects (ProjectId INTEGER PRIMARY KEY, Name TEXT, ContractId INTEGER REFERENCES Contracts(ContractId))")
+		self._db_connection.create_table("CREATE TABLE IF NOT EXISTS Categories (CategoryId INTEGER PRIMARY KEY, Name TEXT)")
+		self._db_connection.create_table("CREATE TABLE IF NOT EXISTS Times (TimeId INTEGER PRIMARY KEY, ProjectId INTEGER REFERENCES Projects(ProjectId), CategoryId INTEGER REFERENCES Categories(CategoryId), Start DATETIME, End DATETIME, Description TEXT)")
 
 		self._contract_controller = domain_controllers.ContractController(self._db_connection, self)
 		self._category_controller = domain_controllers.CategoryController(self._db_connection, self)
