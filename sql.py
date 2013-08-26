@@ -1,4 +1,5 @@
 import sqlite3
+import dateutil
 
 class Database:
     def __init__(self, path):
@@ -71,3 +72,15 @@ class Database:
             cursor.execute(query, arguments)
         else:
             cursor.execute(query)
+            
+    def sql_datetime_to_python(self, value):
+        if value <> None:
+            return dateutil.parser.parse(value)
+        else:
+            return None
+    
+    def python_datetime_to_sql(self, value):
+        if value <> None:
+            return str(value)
+        else:
+            return None
