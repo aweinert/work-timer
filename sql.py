@@ -1,5 +1,5 @@
 import sqlite3
-import dateutil
+import dateutil.parser
 
 class Database:
     def __init__(self, path):
