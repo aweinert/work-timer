@@ -149,8 +149,8 @@ class CommandlineInterface:
 
     def _show_info(self):
         for contract in self._logic_controller.crud_controller.retrieve_all_contracts():
-            aim = self._logic_controller.analysis_controller.get_time_to_work_to_today(contract)
-            actual = self._logic_controller.analysis_controller.get_time_worked_to_today(contract)
+            aim = round(self._logic_controller.analysis_controller.get_time_to_work_to_today(contract), 1)
+            actual = round(self._logic_controller.analysis_controller.get_time_worked_to_today(contract), 1)
 
             self._screen.print_unformatted(contract.name + ": ")
             self._screen.print_unformatted("\tTo work:    " + str(aim) + "h")
