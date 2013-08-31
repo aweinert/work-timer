@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
-import commandline
+import gui
 
 if __name__ == "__main__":
-    cli = commandline.CommandlineInterface()
-    cli.run()
+    gui_object = gui.Gui()
+    gui_object.run()
