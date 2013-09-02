@@ -43,7 +43,12 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="invisible_char">•</property>
+            <property name="invisible_char_set">True</property>
             <property name="input_purpose">number</property>
+            <property name="climb_rate">1</property>
+            <property name="snap_to_ticks">True</property>
+            <property name="numeric">True</property>
+            <property name="wrap">True</property>
           </object>
           <packing>
             <property name="left_attach">1</property>
@@ -57,6 +62,7 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="invisible_char">•</property>
+            <property name="invisible_char_set">True</property>
           </object>
           <packing>
             <property name="left_attach">1</property>
@@ -64,9 +70,6 @@
             <property name="width">1</property>
             <property name="height">1</property>
           </packing>
-        </child>
-        <child>
-          <placeholder/>
         </child>
         <child>
           <object class="GtkAlignment" id="alignment1">
@@ -77,6 +80,7 @@
               <object class="GtkButtonBox" id="buttonbox1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="spacing">5</property>
                 <property name="layout_style">start</property>
                 <child>
                   <object class="GtkButton" id="create_button">
@@ -84,6 +88,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="create_contract_handler" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -97,6 +102,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="receives_default">True</property>
+                    <signal name="clicked" handler="abort_contract_handler" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -112,6 +118,66 @@
             <property name="top_attach">2</property>
             <property name="width">1</property>
             <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <placeholder/>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkAdjustment" id="hours_adjustment">
+    <property name="upper">120</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkWindow" id="main_window">
+    <property name="can_focus">False</property>
+    <property name="resizable">False</property>
+    <child>
+      <object class="GtkBox" id="box1">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">10</property>
+        <child>
+          <object class="GtkButtonBox" id="buttonbox2">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">5</property>
+            <property name="layout_style">start</property>
+            <child>
+              <object class="GtkButton" id="create_contract_button">
+                <property name="label" translatable="yes">Create Contract</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="quit_button">
+            <property name="label" translatable="yes">Quit</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">True</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>
