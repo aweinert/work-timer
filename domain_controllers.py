@@ -159,7 +159,7 @@ class WorktimeController:
 	def create_worktime(self, project, category, start, end, description):
 		"""Writes a new domain-worktime object to the database and returns it to the caller"""
 		query = "INSERT INTO Times (ProjectId, CategoryId, Start, End, Description) VALUES (?,?,?,?,?)"
-		worktime_id = self._db_connection.insert_single_row(query, [project.project_id, category.category_id, self._db_connection.python_datetime_to_sql(start), self._db_connection.python_datetime_to_sql(end), description])
+		worktime_id = self._db_connection.create_single_row(query, [project.project_id, category.category_id, self._db_connection.python_datetime_to_sql(start), self._db_connection.python_datetime_to_sql(end), description])
 
 		worktime = domain.Worktime(worktime_id, project.project_id, category.category_id, start, end, description)
 
