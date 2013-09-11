@@ -18,7 +18,13 @@ class _AnalysisController:
         
         time_worked = 0
         for worktime in filter(lambda x: x.project.contract == contract, worktimes):
-            if worktime.end.date() <= date:
+
+            if worktime.end == None:
+                end_date = datetime.date.today()
+            else:
+                end_date = worktime.end.date()
+                
+            if end_date <= date:
                 worktime_duration = worktime.get_duration()
                 # Since we want time worked in hours, we have to throw numbers around a little bit
                 time_worked += (worktime_duration.days * 24) + (float(worktime_duration.seconds) / (60.0 * 60.0))
