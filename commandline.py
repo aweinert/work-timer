@@ -92,8 +92,8 @@ class CommandlineInterface:
         return configuration[int(choice)]["function"]
     
     def _start_work(self):
-        project = self._choose_domain_object("Please choose a project", self._persistence_controller.retrieve_all_projects)
-        category = self._choose_domain_object("Please choose a category", self._persistence_controller.retrieve_all_categories)
+        project = self._choose_domain_object("Please choose a project", self._logic_controller._persistence_controller.retrieve_all_projects)
+        category = self._choose_domain_object("Please choose a category", self._logic_controller._persistence_controller.retrieve_all_categories)
         description = self._screen.read_string("Please enter a short description: ")
         start_time = datetime.datetime.now()
     
