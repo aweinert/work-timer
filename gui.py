@@ -1,5 +1,7 @@
 from gi.repository import Gtk
 
+import datetime
+
 import logic_layer
 
 class _Window:
@@ -7,15 +9,21 @@ class _Window:
         self._gui = gui
         
         builder = Gtk.Builder()
-        builder.add_objects_from_file(xmlpath, [window_name])
+        builder.add_from_file(xmlpath)
         self._window = builder.get_object(window_name)
         builder.connect_signals(handlers)
+        self._set_internal_objects(builder)
 
     def show(self):
         self._window.show()
         
     def hide(self):
         self._window.hide()
+        
+    def _set_internal_objects(self, builder):
+        """Subclasses may implement this method to keep references
+        to important elements of the window, such as, e.g., text inputs"""
+        pass
         
     # Interface for the GUI-main-object
     # TODO: Throw fitting exceptions
@@ -24,21 +32,22 @@ class _Window:
         to the object in order to update it if the user demands it"""
         pass
         
-    def clear_object(self):
+    def clear(self):
         """Resets all fields in the window to their default value. If the
         window still holds a reference to an object, the reference is
         discarded"""
         pass
 
 class _MainWindow(_Window):
-    def __init__(self, gui, xmlpath):
+    def __init__(self, gui):
+        XMLPATH = "guixml/contract.glade"
         WINDOW_NAME = "main_window"
         HANDLERS = {
-            "create_contract_button_clicked": self._show_create_contract_window,
-            "quit_button_clicked": self._quit
+            "create_button_clicked": self._show_create_contract_window,
+            "quit_button_clicked": self._quit,
         }
         
-        _Window.__init__(self, gui, xmlpath, WINDOW_NAME, HANDLERS)
+        _Window.__init__(self, gui, XMLPATH, WINDOW_NAME, HANDLERS)
         
     def set_object(self):
         # The main window does not display any objects
@@ -49,19 +58,51 @@ class _MainWindow(_Window):
         pass
     
     def _show_create_contract_window(self, button):
-        # Not yet implemented
-        #self._gui.show_create_contract_window()
+        self._gui.create_and_show_contract_window()
         pass
     
     def _quit(self, button):
         self._gui.quit()
         
+class _ContractWindow(_Window):
+    def __init__(self, gui):
+        XMLPATH = "guixml/contract.glade"
+        WINDOW_NAME = "contract_window"
+        HANDLERS = {
+            "create_button_clicked": self._create_contract,
+            "abort_button_clicked": self._abort
+        }
+        
+        _Window.__init__(self, gui, XMLPATH, WINDOW_NAME, HANDLERS)
+        
+        self._initialize_calendars()
+        
+    def _initialize_calendars(self):
+        today = datetime.date.today()
+        self._start_calendar.select_month(today.month, today.year)
+        self._start_calendar.select_day(today.day)
+        self._end_calendar.select_month(today.month, today.year)
+        self._end_calendar.select_day(today.day)
+        
+    def _set_internal_objects(self, builder):
+        self._name_buffer = builder.get_object("name_entry").get_buffer()
+        self._hours_adjustment = builder.get_object("hours_button").get_adjustment()
+        self._start_calendar = builder.get_object("start_calendar")
+        self._end_calendar = builder.get_object("end_calendar")
+        
+    def _create_contract(self, button):
+        crud_controller = self._gui.get_logic_controller().crud_controller
+        
+        contract_name = self._name_buffer.get_text()
+        hours = int(self._hours_adjustment.get_value())
+    
+    def _abort(self, button):
+        self._gui.destroy_window(self)
+        
 class Gui:
-    XML_PATH = "guixml/gui.xml"
-
     def __init__(self, db_path="work.db"):
         self._logic_controller = logic_layer.LogicController(db_path)
-        self._main_window = _MainWindow(self, Gui.XML_PATH)
+        self._main_window = _ContractWindow(self)
         self._windows = [self._main_window]
         
     def run(self):
@@ -75,4 +116,9 @@ class Gui:
         return self._logic_controller
     
     def create_and_show_contract_window(self):
+        contract_window = _ContractWindow(self, Gui.XML_PATH)
+        contract_window.show()
+        self._windows.append(contract_window)
+        
+    def destroy_window(self, window):
         pass
