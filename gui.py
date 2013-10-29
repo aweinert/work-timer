@@ -1,8 +1,14 @@
 from gi.repository import Gtk
+from gi.repository import GObject
 
 import datetime
 
 import logic_layer
+
+class GContract(GObject.GObject):
+    def __init__(self, contract):
+        super(GContract, self).__init__()
+        self.contract = contract
 
 class _Window:
     def __init__(self, gui, xmlpath, window_name, handlers):
@@ -95,6 +101,47 @@ class _ContractWindow(_Window):
         
         contract_name = self._name_buffer.get_text()
         hours = int(self._hours_adjustment.get_value())
+        start_year, start_month, start_day = self._start_calendar.get_date()
+        start_date = datetime.date(start_year, start_month, start_day)
+        end_year, end_month, end_day = self._end_calendar.get_date()
+        end_date = datetime.date(end_year, end_month, end_day)
+        
+        crud_controller.create_contract(contract_name, start_date, end_date, hours)
+    
+    def _abort(self, button):
+        self._gui.destroy_window(self)
+        
+class _ProjectWindow(_Window):
+    def __init__(self, gui):
+        XMLPATH = "guixml/project.glade"
+        WINDOW_NAME = "project_window"
+        HANDLERS = {
+            "create_button_clicked": self._create_project,
+            "abort_button_clicked": self._abort
+        }
+        
+        _Window.__init__(self, gui, XMLPATH, WINDOW_NAME, HANDLERS)
+        
+        self._populate_contract_model()
+        
+    def _set_internal_objects(self, builder):
+        self._project_entry = builder.get_object("name_entry")
+        self._contract_box = builder.get_object("contract_combobox")
+        self._contract_model = builder.get_object("contract_store")
+        
+    def _populate_contract_model(self):
+        for contract in self._gui.get_logic_controller().crud_controller.retrieve_all_contracts():
+            gcontract = GContract(contract)
+            self._contract_model.append([gcontract, contract.name])
+            
+        self._contract_box.set_entry_text_column(1)
+            
+        
+    def _create_project(self, button):
+        project_name = self._project_entry.get_text()
+        contract_iter = self._contract_box.get_active_iter()
+        contract = self._contract_model[contract_iter][0].contract
+        self._gui._logic_controller.crud_controller.create_project(project_name, contract)
     
     def _abort(self, button):
         self._gui.destroy_window(self)
@@ -102,8 +149,9 @@ class _ContractWindow(_Window):
 class Gui:
     def __init__(self, db_path="work.db"):
         self._logic_controller = logic_layer.LogicController(db_path)
-        self._main_window = _ContractWindow(self)
+        self._main_window = _ProjectWindow(self)
         self._windows = [self._main_window]
+        self._main_window._window.connect("destroy", Gtk.main_quit)
         
     def run(self):
         self._main_window.show()
