@@ -5,10 +5,29 @@ import datetime
 
 import logic_layer
 
+class ObjectChooserButton:
+    def __init__(self, button):
+        self._button = button
+        self._model = Gtk.ListStore(GObject.TYPE_STRING, GObject.TYPE_OBJECT)
+        self._button.set_model(self._model)
+        self._button.set_entry_text_column(0)
+        
+    def populate_model(self, objects):
+        for entry in objects:
+            self._model.append([str(entry), entry])
+            
+    def get_chosen_object(self):
+        tree_iter = self._button.get_active_iter()
+        return self._model[tree_iter][1]
+
+
 class GContract(GObject.GObject):
     def __init__(self, contract):
         super(GContract, self).__init__()
         self.contract = contract
+        
+    def __str__(self):
+        return self.contract.name
 
 class _Window:
     def __init__(self, gui, xmlpath, window_name, handlers):
@@ -121,27 +140,29 @@ class _ProjectWindow(_Window):
         }
         
         _Window.__init__(self, gui, XMLPATH, WINDOW_NAME, HANDLERS)
-        
+
         self._populate_contract_model()
         
     def _set_internal_objects(self, builder):
         self._project_entry = builder.get_object("name_entry")
         self._contract_box = builder.get_object("contract_combobox")
-        self._contract_model = builder.get_object("contract_store")
         
     def _populate_contract_model(self):
+        gcontracts = []
         for contract in self._gui.get_logic_controller().crud_controller.retrieve_all_contracts():
-            gcontract = GContract(contract)
-            self._contract_model.append([gcontract, contract.name])
-            
-        self._contract_box.set_entry_text_column(1)
+            gcontracts.append(GContract(contract))
+        
+        self._contract_chooser = ObjectChooserButton(self._contract_box)
+        self._contract_chooser.populate_model(gcontracts)
             
         
     def _create_project(self, button):
         project_name = self._project_entry.get_text()
-        contract_iter = self._contract_box.get_active_iter()
-        contract = self._contract_model[contract_iter][0].contract
-        self._gui._logic_controller.crud_controller.create_project(project_name, contract)
+        contract = self._contract_chooser.get_chosen_object()
+        print project_name
+        print str(contract)
+
+        #self._gui._logic_controller.crud_controller.create_project(project_name, contract)
     
     def _abort(self, button):
         self._gui.destroy_window(self)
