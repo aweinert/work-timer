@@ -1,5 +1,6 @@
 from gi.repository import Gtk
-import gui_wrappers
+import wrappers.contract as contract_wrappers
+
 import gobjects
 import datetime
 from gui.gobjects import GContract
@@ -31,9 +32,9 @@ class ContractWidget (Widget):
         super(ContractWidget, self).__init__(gui, builder)
         
         self._gui = gui
-        self._model = gui_wrappers.ContractStoreWrapper()
-        self._view = gui_wrappers.ContractViewWrapper(self._model, builder.get_object("contracts-view"))
-        self._controller = gui_wrappers.ContractControlWrapper(builder, self._model)
+        self._model = contract_wrappers.StoreWrapper()
+        self._view = contract_wrappers.ViewWrapper(self._model, builder.get_object("contracts-view"))
+        self._controller = contract_wrappers.ControlWrapper(builder, self._model)
         
         self._view._treeview.connect("cursor-changed", lambda x: self._contract_selected())
 

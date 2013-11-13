@@ -4,7 +4,7 @@ from gui.gobjects import GContract
 import datetime
 
     
-class ContractStoreWrapper:
+class StoreWrapper:
     
     OBJECT_COLUMN = 0
     NAME_COLUMN = 1
@@ -51,24 +51,24 @@ class ContractStoreWrapper:
     def get_model(self):
         return self._list_store
     
-class ContractViewWrapper:
+class ViewWrapper:
 
     def __init__(self, model, treeview):
         self._treeview = treeview
         self._model = model.get_model()
         
         self._treeview.set_model(self._model)
-        self._treeview.append_column(Gtk.TreeViewColumn("name", Gtk.CellRendererText(), text=ContractStoreWrapper.NAME_COLUMN))
-        self._treeview.append_column(Gtk.TreeViewColumn("start date", Gtk.CellRendererText(), text=ContractStoreWrapper.FROM_COLUMN))
-        self._treeview.append_column(Gtk.TreeViewColumn("end date", Gtk.CellRendererText(), text=ContractStoreWrapper.TO_COLUMN))
-        self._treeview.append_column(Gtk.TreeViewColumn("hours per week", Gtk.CellRendererText(), text=ContractStoreWrapper.HOURS_COLUMN))
+        self._treeview.append_column(Gtk.TreeViewColumn("name", Gtk.CellRendererText(), text=StoreWrapper.NAME_COLUMN))
+        self._treeview.append_column(Gtk.TreeViewColumn("start date", Gtk.CellRendererText(), text=StoreWrapper.FROM_COLUMN))
+        self._treeview.append_column(Gtk.TreeViewColumn("end date", Gtk.CellRendererText(), text=StoreWrapper.TO_COLUMN))
+        self._treeview.append_column(Gtk.TreeViewColumn("hours per week", Gtk.CellRendererText(), text=StoreWrapper.HOURS_COLUMN))
         
     def get_selected_contract(self):
         model, iterator = self._treeview.get_selection().get_selected()
         assert model is self._model
-        return model[iterator][ContractStoreWrapper.OBJECT_COLUMN]
+        return model[iterator][StoreWrapper.OBJECT_COLUMN]
         
-class ContractControlWrapper:
+class ControlWrapper:
     
     def __init__(self, builder, model):
         self._model = model

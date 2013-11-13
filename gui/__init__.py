@@ -2,7 +2,7 @@ from gi.repository import Gtk
 
 import gobjects
 import widgets
-import gui_wrappers
+import wrappers
 from gui.gobjects import GContract
 
 class Gui:
@@ -29,7 +29,7 @@ class Gui:
                                   gobjects.GWorktime : widgets.WorktimeWidget(self, builder) }
         
 
-        self._notebook = gui_wrappers.NotebookWrapper(builder.get_object("main-notebook"))
+        self._notebook = wrappers.NotebookWrapper(builder.get_object("main-notebook"))
         
         builder.get_object("main-window").connect("destroy", lambda x: self.shutdown_gui())
         builder.get_object("quit-button").connect("clicked", lambda x: self.shutdown_gui())
