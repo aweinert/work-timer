@@ -1,9 +1,11 @@
 from gi.repository import Gtk
 import wrappers.contract as contract_wrappers
+import wrappers.category as category_wrappers
 
 import gobjects
 import datetime
-from gui.gobjects import GContract
+
+from gui.gobjects import GContract, GCategory
 
 class Widget (object):
     def __init__(self, gui, builder):
@@ -72,15 +74,44 @@ class ContractWidget (Widget):
 class CategoryWidget (Widget):
     def __init__(self, gui, builder):
         super(CategoryWidget, self).__init__(gui, builder)
+
+        self._gui = gui
+        self._model = category_wrappers.StoreWrapper()
+        self._view = category_wrappers.ViewWrapper(self._model, builder.get_object("categories-view"))
+        self._controller = category_wrappers.ControlWrapper(builder, self._model)
+        
+        self._view._treeview.connect("cursor-changed", lambda x: self._category_selected())
+
+        # Fill the store with items from the database
+        category_list = gui._logic_controller.crud_controller.retrieve_all_categories()
+        category_list = map(lambda x: gobjects.GCategory(x), category_list)
+        for gcategory in category_list:
+            self._model.add(gcategory)
     
     def create_new(self):
-        pass
+        category = self._gui._logic_controller.crud_controller.create_category("new_category")
+        gcategory = GCategory(category);
+        self._model.add(gcategory)
     
     def save_changes(self):
-        pass
+        selected_gcategory = self._get_selected_category()
+        self._controller.update_category(selected_gcategory)
+        category = selected_gcategory.get_category()
+        self._gui._logic_controller.crud_controller.update_category(category)
+        self._model.update(selected_gcategory)
     
     def delete_object(self):
-        pass
+        gcategory = self._get_selected_category()
+        self._model.remove(gcategory)
+        category = gcategory.get_category()
+        self._gui._logic_controller.crud_controller.delete_category(category)
+    
+    def _category_selected(self):
+        selected_category = self._get_selected_category()
+        self._controller.display_category(selected_category)
+        
+    def _get_selected_category(self):
+        return self._view.get_selected_category()
 
 class ProjectWidget (Widget):
     def __init__(self, gui, builder):
