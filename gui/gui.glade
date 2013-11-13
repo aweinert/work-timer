@@ -282,6 +282,7 @@
               <object class="GtkBox" id="categories-widget">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkTreeView" id="categories-view">
                     <property name="visible">True</property>
@@ -357,6 +358,7 @@
               <object class="GtkBox" id="times-widget">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkTreeView" id="times-view">
                     <property name="visible">True</property>
