@@ -77,7 +77,7 @@ class ContractController:
 		return self._db_connection.retrieve_single_row(query)
 	
 	def update_contract(self, contract):
-		query = "UPDATE Contracts SET (name = ?, start = ?, end = ?, hours = ?) WHERE contract_id = ?"
+		query = "UPDATE Contracts SET name = ?, start = ?, end = ?, hours = ? WHERE ContractId = ?"
 		self._db_connection.update_rows(query, [contract.name, self._db_connection.python_datetime_to_sql(contract.start), self._db_connection.python_datetime_to_sql(contract.end), contract.hours, contract.contract_id])
 		
 	def delete_contract(self, contract):
