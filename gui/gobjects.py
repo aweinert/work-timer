@@ -3,7 +3,7 @@ import domain
 
 class GCategory(GObject.GObject):
     def __init__(self, category):
-        super(GObject, self).__init__()
+        super(GObject.GObject, self).__init__()
         assert isinstance(category, domain.Category)
         self._domain_category = category
         
@@ -21,7 +21,7 @@ class GContract(GObject.GObject):
 
 class GProject(GObject.GObject):
     def __init__(self, project):
-        super(GObject, self).__init__()
+        super(GObject.GObject, self).__init__()
         assert isinstance(project, domain.Project)
         self._domain_project = project
         
@@ -30,7 +30,7 @@ class GProject(GObject.GObject):
     
 class GWorktime(GObject.GObject):
     def __init__(self, worktime):
-        super(GObject, self).__init__()
+        super(GObject.GObject, self).__init__()
         assert isinstance(worktime, domain.Worktime)
         self._domain_worktime = worktime
         
