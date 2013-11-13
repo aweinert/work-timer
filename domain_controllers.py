@@ -8,7 +8,7 @@ class CategoryController:
 	def create_category(self, name):
 		"""Stores a new category-domain object and returns it to the caller"""
 		query = "INSERT INTO Categories (Name) VALUES (?)"
-		category_id = self._db_connection.insert_single_row(query, [name])
+		category_id = self._db_connection.create_single_row(query, [name])
 
 		category = domain.Category(category_id, name)
 		return category
@@ -31,7 +31,7 @@ class CategoryController:
 		
 	def update_category(self, category):
 		"""Writes the changes made in the given contract to the database"""
-		query = "UPDATE Categories SET (name = ?) WHERE CategoryId = ?"
+		query = "UPDATE Categories SET name = ? WHERE CategoryId = ?"
 		self._db_connection.update_rows(query, [category.name, category.category_id])
 		
 	def delete_category(self, category):
@@ -128,7 +128,7 @@ class ProjectController:
 
 	def update_project(self, project):
 		"""Writes the changes made in the given project to the database"""
-		query = "UPDATE Projects SET (name = ?, contract_id = ?) WHERE project_id = ?"
+		query = "UPDATE Projects SET name = ?, contract_id = ? WHERE project_id = ?"
 		self._db_connection.update_rows(query, [project.name, project.contract.contract_id, project.project_id])
 		
 	def delete_project(self, project):
