@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
-import commandline
+import gui
+import logic_layer
 
 if __name__ == "__main__":
-    cli = commandline.CommandlineInterface()
-    cli.run()
+
+    logic_controller = logic_layer.LogicController("work.db")
+    gui_object = gui.Gui(logic_controller)
+    gui_object.run()
