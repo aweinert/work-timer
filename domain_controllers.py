@@ -85,7 +85,7 @@ class ContractController:
 		
 		The given contract is considered invalid after a call to this method"""
 		query = "DELETE FROM Contracts WHERE ContractId = ?"
-		self._db_connection.delete_rows.execute(query, [contract.contract_id])
+		self._db_connection.delete_rows(query, [contract.contract_id])
 		
 	def _create_contract_from_row(self, row):
 		"""Creates a domain.Contract-object from a given row returned from the database"""
