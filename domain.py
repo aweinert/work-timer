@@ -25,6 +25,8 @@ class Contract:
 		if not self.hours == other.hours:
 			return False
 
+		return True
+
 class Project:
 	def __init__(self, project_id, name, contract):
 		self.project_id = project_id
@@ -43,6 +45,8 @@ class Project:
 			return False
 		if not self.contract == other.contract:
 			return False
+		
+		return True
 
 class Category:
 	def __init__(self, category_id, name):
@@ -59,6 +63,8 @@ class Category:
 			return False
 		if not self.name == other.name:
 			return False
+		
+		return True
 
 class Worktime:
 	def __init__(self, time_id, project, category, start, end, description):
@@ -96,3 +102,5 @@ class Worktime:
 			return False
 		if not self.description == other.description:
 			return False
+		
+		return True
