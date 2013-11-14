@@ -1,6 +1,7 @@
 from gi.repository import Gtk
 import wrappers.contract as contract_wrappers
 import wrappers.category as category_wrappers
+import wrappers.project as project_wrappers
 
 import gobjects
 import datetime
@@ -30,11 +31,11 @@ class Widget (object):
         assert False
 
 class ContractWidget (Widget):
-    def __init__(self, gui, builder):
+    def __init__(self, gui, builder, stores):
         super(ContractWidget, self).__init__(gui, builder)
         
         self._gui = gui
-        self._model = contract_wrappers.StoreWrapper()
+        self._model = stores[gobjects.GContract]
         self._view = contract_wrappers.ViewWrapper(self._model, builder.get_object("contracts-view"))
         self._controller = contract_wrappers.ControlWrapper(builder, self._model)
         
@@ -72,11 +73,11 @@ class ContractWidget (Widget):
         return self._view.get_selected_contract()
 
 class CategoryWidget (Widget):
-    def __init__(self, gui, builder):
+    def __init__(self, gui, builder, stores):
         super(CategoryWidget, self).__init__(gui, builder)
 
         self._gui = gui
-        self._model = category_wrappers.StoreWrapper()
+        self._model = stores[gobjects.GCategory]
         self._view = category_wrappers.ViewWrapper(self._model, builder.get_object("categories-view"))
         self._controller = category_wrappers.ControlWrapper(builder, self._model)
         
@@ -114,20 +115,49 @@ class CategoryWidget (Widget):
         return self._view.get_selected_category()
 
 class ProjectWidget (Widget):
-    def __init__(self, gui, builder):
+    def __init__(self, gui, builder, stores):
         super(ProjectWidget, self).__init__(gui, builder)
+
+        self._gui = gui
+        self._model = stores[gobjects.GProject]
+        self._view = project_wrappers.ViewWrapper(self._model, builder.get_object("projects-view"))
+        self._controller = project_wrappers.ControlWrapper(builder, self._model, stores)
+        
+        self._view._treeview.connect("cursor-changed", lambda x: self._project_selected())
+
+        # Fill the store with items from the database
+        project_list = gui._logic_controller.crud_controller.retrieve_all_projects()
+        project_list = map(lambda x: gobjects.GProject(x), project_list)
+        for gproject in project_list:
+            self._model.add(gproject)
     
     def create_new(self):
-        pass
+        project = self._gui._logic_controller.crud_controller.create_project("new_project", None)
+        gproject = GCategory(project);
+        self._model.add(gproject)
     
     def save_changes(self):
-        pass
+        selected_gproject = self._get_selected_project()
+        self._controller.update_project(selected_gproject)
+        project = selected_gproject.get_project()
+        self._gui._logic_controller.crud_controller.update_project(project)
+        self._model.update(selected_gproject)
     
     def delete_object(self):
-        pass
+        gproject = self._get_selected_project()
+        self._model.remove(gproject)
+        project = gproject.get_project()
+        self._gui._logic_controller.crud_controller.delete_project(project)
+    
+    def _project_selected(self):
+        selected_project = self._get_selected_project()
+        self._controller.display_project(selected_project)
+        
+    def _get_selected_project(self):
+        return self._view.get_selected_project()
 
 class WorktimeWidget (Widget):
-    def __init__(self, gui, builder):
+    def __init__(self, gui, builder, stores):
         super(WorktimeWidget, self).__init__(gui, builder)
     
     def create_new(self):

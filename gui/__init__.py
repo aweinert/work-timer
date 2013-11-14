@@ -1,9 +1,10 @@
 from gi.repository import Gtk
 
-import gobjects
 import widgets
-import wrappers
-from gui.gobjects import GContract
+import gobjects
+
+# No idea why we have to import this explicitly...
+import wrappers.worktime
 
 class Gui:
     
@@ -22,11 +23,16 @@ class Gui:
         self._logic_controller = logic_controller
         builder = Gtk.Builder()
         builder.add_from_file("gui/gui.glade")
+        
+        self._stores_per_type = {gobjects.GContract : wrappers.contract.StoreWrapper(),
+                                 gobjects.GProject : wrappers.project.StoreWrapper(),
+                                 gobjects.GCategory : wrappers.category.StoreWrapper(),
+                                 gobjects.GWorktime : wrappers.worktime.StoreWrapper() }
 
-        self._widgets_per_type = {gobjects.GContract : widgets.ContractWidget(self, builder),
-                                  gobjects.GProject : widgets.ProjectWidget(self, builder),
-                                  gobjects.GCategory : widgets.CategoryWidget(self, builder),
-                                  gobjects.GWorktime : widgets.WorktimeWidget(self, builder) }
+        self._widgets_per_type = {gobjects.GContract : widgets.ContractWidget(self, builder, self._stores_per_type),
+                                  gobjects.GProject : widgets.ProjectWidget(self, builder, self._stores_per_type),
+                                  gobjects.GCategory : widgets.CategoryWidget(self, builder, self._stores_per_type),
+                                  gobjects.GWorktime : widgets.WorktimeWidget(self, builder, self._stores_per_type) }
         
 
         self._notebook = wrappers.NotebookWrapper(builder.get_object("main-notebook"))
