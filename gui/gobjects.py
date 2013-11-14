@@ -9,6 +9,12 @@ class GCategory(GObject.GObject):
         
     def get_category(self):
         return self._domain_category
+    
+    def __eq__(self, other):
+        if isinstance(other, GCategory):
+            return self._domain_category == other._domain_category
+        
+        return NotImplemented
 
 class GContract(GObject.GObject):
     def __init__(self, contract):
@@ -19,6 +25,12 @@ class GContract(GObject.GObject):
     def get_contract(self):
         return self._domain_contract
 
+    def __eq__(self, other):
+        if isinstance(other, GContract):
+            return self._domain_contract == other._domain_contract
+        
+        return NotImplemented
+
 class GProject(GObject.GObject):
     def __init__(self, project):
         super(GObject.GObject, self).__init__()
@@ -27,6 +39,12 @@ class GProject(GObject.GObject):
         
     def get_project(self):
         return self._domain_project
+
+    def __eq__(self, other):
+        if isinstance(other, GProject):
+            return self._domain_project == other._domain_project
+        
+        return NotImplemented
     
 class GWorktime(GObject.GObject):
     def __init__(self, worktime):
@@ -36,3 +54,9 @@ class GWorktime(GObject.GObject):
         
     def get_worktime(self):
         return self._domain_worktime
+
+    def __eq__(self, other):
+        if isinstance(other, GWorktime):
+            return self._domain_worktime == other._domain_worktime
+        
+        return NotImplemented
