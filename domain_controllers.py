@@ -128,7 +128,7 @@ class ProjectController:
 
 	def update_project(self, project):
 		"""Writes the changes made in the given project to the database"""
-		query = "UPDATE Projects SET name = ?, contract_id = ? WHERE project_id = ?"
+		query = "UPDATE Projects SET name = ?, ContractId = ? WHERE ProjectId = ?"
 		self._db_connection.update_rows(query, [project.name, project.contract.contract_id, project.project_id])
 		
 	def delete_project(self, project):
